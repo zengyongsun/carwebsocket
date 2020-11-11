@@ -69,12 +69,13 @@ public class ServiceManager {
     public boolean stop() {
         try {
             serviceSocket.stop();
-            serviceSocket = null;
             Log.d(TAG, "stop: stop service socket");
             return true;
         } catch (Exception e) {
             e.printStackTrace();
             return false;
+        }finally {
+            serviceSocket = null;
         }
     }
 

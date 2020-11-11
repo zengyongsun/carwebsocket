@@ -4,6 +4,9 @@ import android.app.Application;
 import android.speech.tts.TextToSpeech;
 import android.widget.Toast;
 
+import com.iflytek.cloud.SpeechConstant;
+import com.iflytek.cloud.SpeechUtility;
+
 import java.util.Locale;
 
 public class MyApplication extends Application implements TextToSpeech.OnInitListener {
@@ -13,7 +16,13 @@ public class MyApplication extends Application implements TextToSpeech.OnInitLis
     @Override
     public void onCreate() {
         super.onCreate();
-        initSpeech();
+        StringBuffer param = new StringBuffer();
+        param.append("appid="+getString(R.string.app_id));
+        param.append(",");
+        // 设置使用v5+
+        param.append(SpeechConstant.ENGINE_MODE+"="+SpeechConstant.MODE_MSC);
+        SpeechUtility.createUtility(this, param.toString());
+//        SpeechUtility.createUtility(this, SpeechConstant.APPID+"="+getString(R.string.app_id));
     }
 
     public void initSpeech() {
@@ -31,6 +40,7 @@ public class MyApplication extends Application implements TextToSpeech.OnInitLis
             if (result == TextToSpeech.LANG_MISSING_DATA
                     || result == TextToSpeech.LANG_NOT_SUPPORTED) {
                 Toast.makeText(this, "数据丢失或不支持", Toast.LENGTH_SHORT).show();
+                voice("软件开启了");
             }
         }
     }
