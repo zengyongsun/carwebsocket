@@ -20,6 +20,16 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+    signingConfigs {
+
+        release {
+            keyAlias 'carsm'
+            keyPassword 'sm2020'
+            storeFile file('carwebsocket.jks')
+            storePassword 'sm2020'
+        }
+    }
+
     sourceSets {
         main {
             jniLibs.srcDirs = ['libs']
@@ -31,6 +41,7 @@ android {
 dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar"])
     implementation 'androidx.appcompat:appcompat:1.2.0'
+    implementation 'com.google.android.material:material:1.2.1'
     implementation 'androidx.constraintlayout:constraintlayout:2.0.2'
     implementation files('libs/Msc.jar')
     testImplementation 'junit:junit:4.12'

@@ -47,11 +47,13 @@ public class ServiceSocket extends WebSocketServer {
     @Override
     public void onError(WebSocket conn, Exception ex) {
         Log.d(TAG, "onError: " + ex.toString());
+        _serServiceManager.onStart("车载服务器：onError " + ex.toString());
     }
 
     @Override
     public void onStart() {
         //启动成功时调用
         Log.d(TAG, "onStart: ");
+        _serServiceManager.onStart("车载服务器：WebSocket启动成功！");
     }
 }

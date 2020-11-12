@@ -9,7 +9,7 @@ public class GpRmcBeanTest {
 
   @Test
   public void parse() {
-    String data = "$GPRMC,020250.00,A,2813.9891299,N,11252.6278784,E,0.033,315.7,161117,0.0,E,A*30";
+    String data = "$GPRMC,071317.00,A,2810.4195048,N,11254.9934421,E,0.009,98.2,101120,0.0,E,D*07";
     GpRmcBean gpRmcBean = new GpRmcBean(data);
     Gson gson = new Gson();
 

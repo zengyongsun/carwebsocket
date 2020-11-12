@@ -1,53 +1,27 @@
 package com.dm.carwebsocket;
 
 import android.app.Application;
-import android.speech.tts.TextToSpeech;
-import android.widget.Toast;
 
 import com.iflytek.cloud.SpeechConstant;
 import com.iflytek.cloud.SpeechUtility;
 
-import java.util.Locale;
-
-public class MyApplication extends Application implements TextToSpeech.OnInitListener {
-
-    private TextToSpeech textToSpeech;
+public class MyApplication extends Application {
 
     @Override
     public void onCreate() {
         super.onCreate();
-        StringBuffer param = new StringBuffer();
-        param.append("appid="+getString(R.string.app_id));
-        param.append(",");
-        // 设置使用v5+
-        param.append(SpeechConstant.ENGINE_MODE+"="+SpeechConstant.MODE_MSC);
-        SpeechUtility.createUtility(this, param.toString());
-//        SpeechUtility.createUtility(this, SpeechConstant.APPID+"="+getString(R.string.app_id));
-    }
+        // 应用程序入口处调用,避免手机内存过小,杀死后台进程后通过历史intent进入Activity造成SpeechUtility对象为null
+        // 注意：此接口在非主进程调用会返回null对象，如需在非主进程使用语音功能，请增加参数：SpeechConstant.FORCE_LOGIN+"=true"
+        // 参数间使用“,”分隔。
+        // 设置你申请的应用appid
 
-    public void initSpeech() {
-        textToSpeech = new TextToSpeech(getApplicationContext(), this);
-        // 设置音调，值越大声音越尖（女生），值越小则变成男声,1.0是常规
-        textToSpeech.setPitch(0.5f);
-        //设定语速 ，默认1.0正常语速
-        textToSpeech.setSpeechRate(1.0f);
-    }
+        // 注意： appid 必须和下载的SDK保持一致，否则会出现10407错误
 
-    @Override
-    public void onInit(int status) {
-        if (status == TextToSpeech.SUCCESS) {
-            int result = textToSpeech.setLanguage(Locale.CHINA);
-            if (result == TextToSpeech.LANG_MISSING_DATA
-                    || result == TextToSpeech.LANG_NOT_SUPPORTED) {
-                Toast.makeText(this, "数据丢失或不支持", Toast.LENGTH_SHORT).show();
-                voice("软件开启了");
-            }
-        }
-    }
-
-    public void voice(String str) {
-        //QUEUE_FLUSH方式表示清除当前队列中的内容而直接播放新的内容，
-        // QUEUE_ADD方式表示将新的内容添加到队列尾部进行播放
-        textToSpeech.speak(str, TextToSpeech.QUEUE_ADD, null);
+        String param = "appid=" + getString(R.string.app_id) +
+                "," +
+                // 设置使用v5+
+                SpeechConstant.ENGINE_MODE + "=" + SpeechConstant.MODE_MSC +
+                SpeechConstant.FORCE_LOGIN + "=true";
+        SpeechUtility.createUtility(this, param);
     }
 }

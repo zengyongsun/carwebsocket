@@ -66,6 +66,12 @@ public class ServiceManager {
         }
     }
 
+    public void onStart(String result){
+        if (receiveData != null) {
+            receiveData.onStartWebSocket(result);
+        }
+    }
+
     public boolean stop() {
         try {
             serviceSocket.stop();
@@ -81,6 +87,7 @@ public class ServiceManager {
 
     public interface WebSocketReceiveData {
         void playVoice(String message);
+        void onStartWebSocket(String result);
     }
 
 
