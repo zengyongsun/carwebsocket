@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
-import android.os.Environment;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
@@ -14,6 +13,8 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.dm.carwebsocket.settings.SettingsActivity;
+import com.dm.carwebsocket.util.IPUtils;
+import com.dm.carwebsocket.util.SPUtils;
 import com.iflytek.cloud.ErrorCode;
 import com.iflytek.cloud.InitListener;
 import com.iflytek.cloud.SpeechConstant;
@@ -33,11 +34,23 @@ public class MainActivity extends AppCompatActivity {
     private TextView ipValueTv;
     private TextView tpcIPTv;
 
+    private WebSocketReceiver receiver;
+
+    // 语音合成对象
+    private SpeechSynthesizer mTts;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        intiView();
+        // 初始化语音合成对象
+        mTts = SpeechSynthesizer.createSynthesizer(this, mTtsInitListener);
+        startBroadReceiver();
+        onStartService();
+    }
 
+    private void intiView() {
         ipValueTv = findViewById(R.id.ipValue);
         tpcIPTv = findViewById(R.id.tcpIp);
         voiceState = findViewById(R.id.voiceState);
@@ -47,7 +60,7 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.btVoice).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                voice("语音播报正常");
+                voice();
             }
         });
 
@@ -57,15 +70,11 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(new Intent(MainActivity.this, SettingsActivity.class));
             }
         });
-        /*语音合成*/
-        // 初始化合成对象
-        mTts = SpeechSynthesizer.createSynthesizer(this, mTtsInitListener);
-        startBroadReceiver();
-        onStartService();
     }
 
-    private WebSocketReceiver receiver;
-
+    /**
+     * 服务通过这个广播和Activity通讯
+     */
     private void startBroadReceiver() {
         receiver = new WebSocketReceiver();
         IntentFilter filter = new IntentFilter();
@@ -110,16 +119,16 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
-    private void voice(String msg) {
+    private void voice() {
         setParam();
-        int code = mTts.startSpeaking(msg, mTtsListener);
+        int code = mTts.startSpeaking("语音播报正常", null);
         if (code != ErrorCode.SUCCESS) {
             voiceState.setText("语音合成失败,错误码: " + code + ",请点击网址https://www.xfyun.cn/document/error-code查询解决方案");
         }
     }
 
     /**
-     * 参数设置
+     * 语音合成参数设置，不设置默认使用的是云语音合成，而不是离线的语音合成
      */
     private void setParam() {
         // 清空参数
@@ -146,69 +155,6 @@ public class MainActivity extends AppCompatActivity {
         return tempBuffer.toString();
     }
 
-    // 语音合成对象
-    private SpeechSynthesizer mTts;
-    //缓冲进度
-    private int mPercentForBuffering = 0;
-    //播放进度
-    private int mPercentForPlaying = 0;
-
-
-    /**
-     * 合成回调监听。
-     */
-    private SynthesizerListener mTtsListener = new SynthesizerListener() {
-
-        @Override
-        public void onSpeakBegin() {
-            Log.d(TAG, "开始播放：" + System.currentTimeMillis());
-        }
-
-        @Override
-        public void onSpeakPaused() {
-            //("暂停播放");
-        }
-
-        @Override
-        public void onSpeakResumed() {
-            //("继续播放");
-        }
-
-        @Override
-        public void onBufferProgress(int percent, int beginPos, int endPos,
-                                     String info) {
-            // 合成进度
-            mPercentForBuffering = percent;
-            //(String.format(getString(R.string.tts_toast_format), mPercentForBuffering, mPercentForPlaying));
-        }
-
-        @Override
-        public void onSpeakProgress(int percent, int beginPos, int endPos) {
-            // 播放进度
-            mPercentForPlaying = percent;
-            //(String.format(getString(R.string.tts_toast_format),mPercentForBuffering, mPercentForPlaying));
-        }
-
-        @Override
-        public void onCompleted(SpeechError error) {
-            if (error == null) {
-                //("播放完成");
-            } else if (error != null) {
-                voiceState.setText(error.getPlainDescription(true));
-            }
-        }
-
-        @Override
-        public void onEvent(int eventType, int arg1, int arg2, Bundle obj) {
-            // 以下代码用于获取与云端的会话id，当业务出错时将会话id提供给技术支持人员，可用于查询会话日志，定位出错原因
-            // 若使用本地能力，会话id为null
-            if (SpeechEvent.EVENT_SESSION_ID == eventType) {
-                String sid = obj.getString(SpeechEvent.KEY_EVENT_AUDIO_URL);
-                Log.d(TAG, "session id =" + sid);
-            }
-        }
-    };
-
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -223,7 +169,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public class WebSocketReceiver extends BroadcastReceiver {
-
 
         @Override
         public void onReceive(Context context, Intent intent) {

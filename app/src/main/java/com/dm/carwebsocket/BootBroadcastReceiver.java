@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
+import android.widget.Toast;
 
 /**
  * author : Zeyo
@@ -24,5 +25,6 @@ public class BootBroadcastReceiver extends BroadcastReceiver {
             context.startActivity(startIntent);
         }
         Log.d(TAG, "onReceive: 调用了");
+        Toast.makeText(context, "系统启动了", Toast.LENGTH_SHORT).show();
     }
 }

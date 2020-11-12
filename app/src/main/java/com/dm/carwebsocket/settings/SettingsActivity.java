@@ -7,7 +7,7 @@ import android.widget.EditText;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.dm.carwebsocket.R;
-import com.dm.carwebsocket.SPUtils;
+import com.dm.carwebsocket.util.SPUtils;
 
 public class SettingsActivity extends AppCompatActivity {
 

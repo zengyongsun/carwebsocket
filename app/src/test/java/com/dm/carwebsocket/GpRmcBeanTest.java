@@ -1,6 +1,7 @@
 package com.dm.carwebsocket;
 
 
+import com.dm.carwebsocket.gps.GpRmcBean;
 import com.google.gson.Gson;
 
 import org.junit.Test;
