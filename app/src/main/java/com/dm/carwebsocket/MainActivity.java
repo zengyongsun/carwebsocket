@@ -87,7 +87,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         ipValueTv.setText("本机IP：" + IPUtils.getLocalIp());
-        tpcIPTv.setText("RTC模块IP：" + SPUtils.get(this, SPUtils.gps_tcp_ip,
+        tpcIPTv.setText("RTK模块IP：" + SPUtils.get(this, SPUtils.gps_tcp_ip,
                 SPUtils.tcp_ip_default_value));
     }
 

@@ -84,11 +84,11 @@ public class WebSocketService extends Service
                 while (ok) {
                     if (clientSocket.createConnect(host, 4444)) {
                         ok = false;
-                        tcpState("车载服务器：RTC的tcp连接成功");
+                        tcpState("车载服务器：RTC的TCP连接成功");
                     } else {
                         host = (String) SPUtils.get(WebSocketService.this,
                                 SPUtils.gps_tcp_ip, SPUtils.tcp_ip_default_value);
-                        tcpState("车载服务器：RTC的tcp连接失败，请检查tcpIP");
+                        tcpState("车载服务器：RTK的TCP连接失败，请检查应用的RTK IP配置");
                     }
                     try {
                         Thread.sleep(5000);

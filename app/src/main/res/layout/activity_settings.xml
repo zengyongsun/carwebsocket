@@ -11,9 +11,10 @@
         android:id="@+id/tvGps"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="50dp"
-        android:text="tcpIp："
+        android:text="RTK模块的IP："
         android:textSize="16sp"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintRight_toLeftOf="@+id/gpsIp"
         app:layout_constraintBottom_toBottomOf="@+id/btGps"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toTopOf="@+id/btGps" />
@@ -27,6 +28,7 @@
         android:paddingLeft="5dp"
         android:paddingRight="5dp"
         android:text="192.168.100.100"
+        app:layout_constraintRight_toLeftOf="@id/btGps"
         app:layout_constraintBottom_toBottomOf="@+id/btGps"
         app:layout_constraintLeft_toRightOf="@+id/tvGps"
         app:layout_constraintTop_toTopOf="@+id/btGps" />
@@ -35,6 +37,7 @@
         android:id="@+id/btGps"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        app:layout_constraintRight_toRightOf="parent"
         android:text="确定"
         app:layout_constraintLeft_toRightOf="@+id/gpsIp"
         app:layout_constraintTop_toTopOf="parent" />
