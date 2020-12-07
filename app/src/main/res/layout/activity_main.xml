@@ -43,6 +43,26 @@
         android:layout_marginTop="20dp"
         android:text="RTK的IP"
         app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toLeftOf="@+id/SipSettings"
+        app:layout_constraintTop_toBottomOf="@+id/btVoice" />
+
+    <Button
+        android:id="@+id/SipSettings"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:text="SIP配置"
+        app:layout_constraintLeft_toRightOf="@+id/goSettings"
+        app:layout_constraintRight_toLeftOf="@+id/SipClear"
+        app:layout_constraintTop_toBottomOf="@+id/btVoice" />
+
+    <Button
+        android:id="@+id/SipClear"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:text="SIP清除"
+        app:layout_constraintLeft_toRightOf="@+id/SipSettings"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/btVoice" />
 
@@ -73,6 +93,15 @@
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/webSocketState" />
 
+    <TextView
+        android:id="@+id/sipSocketState"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tcpState" />
+
 
     <TextView
         android:id="@+id/tvMsg"
@@ -85,7 +114,7 @@
         android:textStyle="bold"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tcpState" />
+        app:layout_constraintTop_toBottomOf="@+id/sipSocketState" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

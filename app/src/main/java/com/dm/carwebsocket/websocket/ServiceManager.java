@@ -14,81 +14,90 @@ import java.util.Set;
  * desc   :
  * version: 1.0
  */
-public class ServiceManager {
+public class ServiceManager implements SocketManager {
 
-    private static final String TAG = "WebSocket#SerManager";
-    private ServiceSocket serviceSocket = null;
+  private static final String TAG = "ServiceManager";
+  private ServiceSocket serviceSocket = null;
 
-    private Set<WebSocket> userSet = new HashSet<>();
-    private WebSocketReceiveData receiveData;
+  private Set<WebSocket> userSet = new HashSet<>();
+  private WebSocketReceiveData receiveData;
 
-    public void setReceiveData(WebSocketReceiveData receiveData) {
-        this.receiveData = receiveData;
+  public void setReceiveData(WebSocketReceiveData receiveData) {
+    this.receiveData = receiveData;
+  }
+
+  public ServiceManager() {
+  }
+
+  public void userLogin(WebSocket socket) {
+    if (socket != null) {
+      userSet.add(socket);
     }
+  }
 
-    public ServiceManager() {
+  public void userLeave(WebSocket socket) {
+    if (userSet.equals(socket)) {
+      userSet.remove(socket);
     }
+  }
 
-    public void userLogin(WebSocket socket) {
-        if (socket != null) {
-            userSet.add(socket);
-        }
+  public void sendMessageToAll(String message) {
+    for (WebSocket socket : userSet) {
+      if (socket != null) {
+        socket.send(message);
+      }
     }
+  }
 
-    public void userLeave(WebSocket socket) {
-        if (userSet.equals(socket)) {
-            userSet.remove(socket);
-        }
+  public boolean start(int port) {
+    if (port < 0) {
+      Log.d(TAG, "start: port error");
+      return false;
     }
+    Log.d(TAG, "start: service socket");
+    serviceSocket = new ServiceSocket(this, port);
+    serviceSocket.start();
+    return true;
+  }
 
-    public void sendMessageToAll(String message) {
-        for (WebSocket socket : userSet) {
-            if (socket != null) {
-                socket.send(message);
-            }
-        }
+  public void onMessage(WebSocket socket, String message) {
+    if (receiveData != null) {
+      receiveData.playVoice(message);
     }
+  }
 
-    public boolean start(int port) {
-        if (port < 0) {
-            Log.d(TAG, "start: port error");
-            return false;
-        }
-        Log.d(TAG, "start: service socket");
-        serviceSocket = new ServiceSocket(this, port);
-        serviceSocket.start();
-        return true;
+  @Override
+  public void onError(String ex) {
+    if (receiveData != null) {
+      receiveData.onStartWebSocket("车载服务器：GpsWebSocket" + ex);
     }
+  }
 
-    public void onMessage(WebSocket socket, String message) {
-        if (receiveData != null) {
-            receiveData.playVoice(message);
-        }
+  @Override
+  public void onStart() {
+    if (receiveData != null) {
+      receiveData.onStartWebSocket("车载服务器：GpsWebSocket启动成功！");
     }
+  }
 
-    public void onStart(String result){
-        if (receiveData != null) {
-            receiveData.onStartWebSocket(result);
-        }
+  public boolean stop() {
+    try {
+      serviceSocket.stop();
+      Log.d(TAG, "stop: stop service socket");
+      return true;
+    } catch (Exception e) {
+      e.printStackTrace();
+      return false;
+    } finally {
+      serviceSocket = null;
     }
+  }
 
-    public boolean stop() {
-        try {
-            serviceSocket.stop();
-            Log.d(TAG, "stop: stop service socket");
-            return true;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        }finally {
-            serviceSocket = null;
-        }
-    }
+  public interface WebSocketReceiveData {
+    void playVoice(String message);
 
-    public interface WebSocketReceiveData {
-        void playVoice(String message);
-        void onStartWebSocket(String result);
-    }
+    void onStartWebSocket(String result);
+  }
 
 
 }

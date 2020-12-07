@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingBottom="48dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:id="@+id/tvTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:focusable="true"
+            android:text="SIP帐号设置"
+            android:textColor="@color/black"
+            android:textSize="20sp"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+
+        <TextView
+            android:id="@+id/tvUserDesc"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="50dp"
+            android:textColor="@color/black"
+            android:text="用户名"
+            app:layout_constraintTop_toBottomOf="@+id/tvTitle"
+            app:layout_constraintRight_toLeftOf="@+id/username"
+            android:textSize="18sp"
+            app:layout_constraintLeft_toLeftOf="parent" />
+
+        <EditText
+            android:id="@+id/username"
+            android:layout_width="150dp"
+            android:layout_height="50dp"
+            android:textColor="@color/black"
+            app:layout_constraintBottom_toBottomOf="@+id/tvUserDesc"
+            app:layout_constraintLeft_toRightOf="@+id/tvUserDesc"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/tvUserDesc"
+            tools:text="156354" />
+
+        <TextView
+            android:id="@+id/tvPsw"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="30dp"
+            android:text="密码"
+            android:textColor="@color/black"
+            android:textSize="18sp"
+            app:layout_constraintRight_toRightOf="@+id/tvUserDesc"
+            app:layout_constraintTop_toBottomOf="@+id/tvUserDesc" />
+
+        <EditText
+            android:id="@+id/password"
+            android:layout_width="150dp"
+            android:layout_height="50dp"
+            android:textColor="@color/black"
+            app:layout_constraintBottom_toBottomOf="@+id/tvPsw"
+            app:layout_constraintLeft_toRightOf="@+id/tvPsw"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/tvPsw" />
+
+        <TextView
+            android:id="@+id/tvDomain"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="30dp"
+            android:text="域名"
+            android:textColor="@color/black"
+            android:textSize="18sp"
+            app:layout_constraintRight_toRightOf="@+id/tvPsw"
+            app:layout_constraintTop_toBottomOf="@+id/tvPsw" />
+
+        <EditText
+            android:id="@+id/domain"
+            android:layout_width="150dp"
+            android:layout_height="50dp"
+            android:inputType="number|text"
+            android:textColor="@color/black"
+            app:layout_constraintBottom_toBottomOf="@+id/tvDomain"
+            app:layout_constraintLeft_toRightOf="@+id/tvDomain"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/tvDomain" />
+
+        <Button
+            android:id="@+id/configure"
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+            android:layout_marginTop="49dp"
+            android:background="@drawable/select_dialog_confirm"
+            android:text="连 接"
+            android:textAllCaps="false"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tvDomain" />
+
+        <Button
+            android:id="@+id/cancel"
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+            android:layout_marginLeft="64dp"
+            android:background="@drawable/select_dialog_cancel"
+            android:text="取 消"
+            android:textAllCaps="false"
+            android:textColor="@color/black"
+            app:layout_constraintLeft_toRightOf="@+id/configure"
+            app:layout_constraintTop_toTopOf="@+id/configure" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:visibility="gone"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <RadioGroup
+            android:id="@+id/assistant_transports"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <RadioButton
+                android:id="@+id/transport_udp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:checked="true"
+                android:text="UDP" />
+
+            <RadioButton
+                android:id="@+id/transport_tcp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:text="TCP" />
+
+            <RadioButton
+                android:id="@+id/transport_tls"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:text="TLS" />
+
+        </RadioGroup>
+
+    </LinearLayout>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

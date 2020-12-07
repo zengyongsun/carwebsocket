@@ -17,43 +17,43 @@ import java.net.InetSocketAddress;
  */
 public class ServiceSocket extends WebSocketServer {
 
-    private static final String TAG = "WebSocket#ServiceSocket";
+  private static final String TAG = "WebSocket#ServiceSocket";
 
-    private ServiceManager _serServiceManager;
+  private SocketManager socketManager;
 
-    public ServiceSocket(ServiceManager serServiceManager, int port) {
-        super(new InetSocketAddress(port));
-        this._serServiceManager = serServiceManager;
-    }
+  public ServiceSocket(SocketManager serServiceManager, int port) {
+    super(new InetSocketAddress(port));
+    this.socketManager = serServiceManager;
+  }
 
-    @Override
-    public void onOpen(WebSocket conn, ClientHandshake handshake) {
-        Log.d(TAG, "onOpen: " + conn);
-        _serServiceManager.userLogin(conn);
-    }
+  @Override
+  public void onOpen(WebSocket conn, ClientHandshake handshake) {
+    Log.d(TAG, "onOpen: " + conn);
+    socketManager.userLogin(conn);
+  }
 
-    @Override
-    public void onClose(WebSocket conn, int code, String reason, boolean remote) {
-        Log.d(TAG, "onClose: " + conn);
-        _serServiceManager.userLeave(conn);
-    }
+  @Override
+  public void onClose(WebSocket conn, int code, String reason, boolean remote) {
+    Log.d(TAG, "onClose: " + conn);
+    socketManager.userLeave(conn);
+  }
 
-    @Override
-    public void onMessage(WebSocket conn, String message) {
-        Log.d(TAG, "onMessage: " + message);
-        _serServiceManager.onMessage(conn, message);
-    }
+  @Override
+  public void onMessage(WebSocket conn, String message) {
+    Log.d(TAG, "onMessage: " + message);
+    socketManager.onMessage(conn, message);
+  }
 
-    @Override
-    public void onError(WebSocket conn, Exception ex) {
-        Log.d(TAG, "onError: " + ex.toString());
-        _serServiceManager.onStart("车载服务器：onError " + ex.toString());
-    }
+  @Override
+  public void onError(WebSocket conn, Exception ex) {
+    Log.d(TAG, "onError: " + ex.toString());
+    socketManager.onError(ex.toString());
+  }
 
-    @Override
-    public void onStart() {
-        //启动成功时调用
-        Log.d(TAG, "onStart: ");
-        _serServiceManager.onStart("车载服务器：WebSocket启动成功！");
-    }
+  @Override
+  public void onStart() {
+    //启动成功时调用
+    Log.d(TAG, "onStart: ");
+    socketManager.onStart();
+  }
 }
