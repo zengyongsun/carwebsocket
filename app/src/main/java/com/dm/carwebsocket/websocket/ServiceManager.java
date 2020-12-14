@@ -36,7 +36,7 @@ public class ServiceManager implements SocketManager {
   }
 
   public void userLeave(WebSocket socket) {
-    if (userSet.equals(socket)) {
+    if (userSet.contains(socket)) {
       userSet.remove(socket);
     }
   }

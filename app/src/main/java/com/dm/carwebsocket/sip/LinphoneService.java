@@ -316,6 +316,7 @@ public class LinphoneService extends Service implements SipSocketManger.SipSocke
 
   @Override
   public void receiveMessage(SipDataBean message) {
+    android.util.Log.d("LinphoneService", "receiveMessage: " + message);
     if (action_incoming.equals(message.action)) {
       //来电的操作
       if (message.accept) {//接听

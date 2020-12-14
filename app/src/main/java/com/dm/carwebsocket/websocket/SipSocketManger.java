@@ -26,13 +26,14 @@ public class SipSocketManger implements SocketManager {
   }
 
   public void userLogin(WebSocket socket) {
+    Log.d(TAG, "userLogin: "+socket);
     if (socket != null) {
       userSet.add(socket);
     }
   }
 
   public void userLeave(WebSocket socket) {
-    if (userSet.equals(socket)) {
+    if (userSet.contains(socket)) {
       userSet.remove(socket);
     }
   }
@@ -59,6 +60,7 @@ public class SipSocketManger implements SocketManager {
   public void onMessage(WebSocket socket, String message) {
     if (receiveData != null) {
       try {
+        Log.d(TAG, "onMessage: message"+message);
         receiveData.receiveMessage(jsonToBean(message));
       }catch(Exception ex){
         ex.printStackTrace();
@@ -107,6 +109,7 @@ public class SipSocketManger implements SocketManager {
   }
 
   public SipDataBean jsonToBean(String json) {
+    Log.d(TAG, "jsonToBean: "+json);
     return gson.fromJson(json, SipDataBean.class);
   }
 
