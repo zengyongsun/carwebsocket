@@ -36,6 +36,7 @@
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tcpIp" />
 
+
     <Button
         android:id="@+id/goSettings"
         android:layout_width="wrap_content"

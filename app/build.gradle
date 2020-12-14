@@ -8,7 +8,7 @@ android {
         applicationId "com.dm.carwebsocket"
         minSdkVersion 22
         targetSdkVersion 30
-        versionCode 1
+        versionCode 20
         versionName "2.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -63,4 +63,6 @@ dependencies {
     implementation "androidx.lifecycle:lifecycle-viewmodel:$lifecycle_version"
     // LiveData
     implementation "androidx.lifecycle:lifecycle-livedata:$lifecycle_version"
+
+    implementation 'com.tencent.bugly:crashreport_upgrade:1.4.2'
 }

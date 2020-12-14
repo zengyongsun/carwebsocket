@@ -26,6 +26,7 @@ import com.iflytek.cloud.InitListener;
 import com.iflytek.cloud.SpeechConstant;
 import com.iflytek.cloud.SpeechSynthesizer;
 import com.iflytek.cloud.util.ResourceUtil;
+import com.tencent.bugly.beta.Beta;
 
 import java.util.ArrayList;
 
@@ -185,6 +186,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     switch (id) {
       case R.id.btVoice:
         voice();
+        Beta.checkUpgrade(false,false);
         break;
       case R.id.goSettings:
         startActivity(new Intent(MainActivity.this, SettingsActivity.class));

@@ -4,6 +4,7 @@ import android.app.Application;
 
 import com.iflytek.cloud.SpeechConstant;
 import com.iflytek.cloud.SpeechUtility;
+import com.tencent.bugly.Bugly;
 
 public class MyApplication extends Application {
 
@@ -16,7 +17,7 @@ public class MyApplication extends Application {
         // 设置你申请的应用appid
 
         // 注意： appid 必须和下载的SDK保持一致，否则会出现10407错误
-
+        Bugly.init(getApplicationContext(), "d93f87ded1", false);
         String param = "appid=" + getString(R.string.app_id) +
                 "," +
                 // 设置使用v5+
