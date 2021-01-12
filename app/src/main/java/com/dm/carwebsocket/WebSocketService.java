@@ -14,6 +14,7 @@ import androidx.annotation.Nullable;
 
 import com.dm.carwebsocket.gps.ClientSocket;
 import com.dm.carwebsocket.gps.GpRmcBean;
+import com.dm.carwebsocket.gps.KSXTBean;
 import com.dm.carwebsocket.gps.SocketDataParser;
 import com.dm.carwebsocket.util.SPUtils;
 import com.dm.carwebsocket.websocket.ServiceManager;
@@ -30,13 +31,14 @@ import com.iflytek.cloud.util.ResourceUtil;
  * version: 1.0
  */
 public class WebSocketService extends Service
-        implements ServiceManager.WebSocketReceiveData, SocketDataParser {
+        implements ServiceManager.WebSocketReceiveData, SocketDataParser, ClientSocket.ConnectState {
 
     public static final String TAG = WebSocketService.class.getSimpleName();
     private ServiceManager serviceManager;
 
     public static final String webSocketStateAction = "com.dm.carwebsocket.websocket_state";
     public static final String tcpStateAction = "com.dm.carwebsocket.tcp_state";
+    private ClientSocket clientSocket;
 
     @Override
     public void onCreate() {
@@ -73,14 +75,23 @@ public class WebSocketService extends Service
         serviceManager.start(7890);
         serviceManager.setReceiveData(this);
 
-        final ClientSocket clientSocket = new ClientSocket();
+        clientSocket = new ClientSocket();
+        clientSocket.setState(this);
         clientSocket.setSocketDataParser(this);
+        createConnect(clientSocket);
+
+        // 初始化语音合成对象
+        mTts = SpeechSynthesizer.createSynthesizer(this, null);
+    }
+
+    private void createConnect(final ClientSocket clientSocket) {
         new Thread(new Runnable() {
             @Override
             public void run() {
                 boolean ok = true;
                 String host = (String) SPUtils.get(WebSocketService.this,
                         SPUtils.gps_tcp_ip, SPUtils.tcp_ip_default_value);
+//                String host = "221.131.74.200";
                 while (ok) {
                     if (clientSocket.createConnect(host, 4444)) {
                         ok = false;
@@ -97,10 +108,8 @@ public class WebSocketService extends Service
                     }
                 }
             }
-        }).start();
 
-        // 初始化语音合成对象
-        mTts = SpeechSynthesizer.createSynthesizer(this, null);
+        }).start();
     }
 
     /**
@@ -163,6 +172,7 @@ public class WebSocketService extends Service
 
     @Override
     public void onStartWebSocket(String result) {
+        SPUtils.put(this, SPUtils.rtc_desc, result);
         Intent intent = new Intent(webSocketStateAction);
         intent.putExtra("result", result);
         //加了下面一行收不到动态注册的广播
@@ -171,6 +181,7 @@ public class WebSocketService extends Service
     }
 
     public void tcpState(String result) {
+        SPUtils.put(this, SPUtils.tcp_desc, result);
         Intent intent = new Intent(tcpStateAction);
         intent.putExtra("result", result);
         sendBroadcast(intent, null);
@@ -179,8 +190,12 @@ public class WebSocketService extends Service
     @Override
     public void dataParser(final String data) {
         Log.d(TAG, "dataParser: " + data);
-        if (data.startsWith("$GPRMC")) {
-            serviceManager.sendMessageToAll(parseToJson(data));
+//        if (data.startsWith("$GPRMC")) {
+//            serviceManager.sendMessageToAll(parseToJson(data));
+//        }
+
+        if (data.startsWith("$KSXT")) {
+            serviceManager.sendMessageToAll(parseKSXTToJson(data));
         }
     }
 
@@ -190,6 +205,13 @@ public class WebSocketService extends Service
         return gson.toJson(gpRmcBean);
     }
 
+    public String parseKSXTToJson(String data) {
+        KSXTBean ksxt = new KSXTBean(data);
+        Gson gson = new Gson();
+        return gson.toJson(ksxt);
+    }
+
+
     private void voice(String msg) {
         setParam();
         mTts.startSpeaking(msg, null);
@@ -197,4 +219,10 @@ public class WebSocketService extends Service
 
     // 语音合成对象
     private SpeechSynthesizer mTts;
+
+    @Override
+    public void socketDisconnect() {
+        //socket连接断开的回调
+        createConnect(clientSocket);
+    }
 }

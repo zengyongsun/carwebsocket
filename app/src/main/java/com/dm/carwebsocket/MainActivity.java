@@ -69,6 +69,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     findViewById(R.id.goSettings).setOnClickListener(this);
     findViewById(R.id.SipSettings).setOnClickListener(this);
     findViewById(R.id.SipClear).setOnClickListener(this);
+
+    String tcpDesc = (String) SPUtils.get(this, SPUtils.tcp_desc, "");
+    String sipDesc = (String) SPUtils.get(this, SPUtils.sip_desc, "");
+    String rtcDesc = (String) SPUtils.get(this, SPUtils.rtc_desc, "");
+    socketState.setText(rtcDesc);
+    tcpState.setText(tcpDesc);
+    sipSocketTv.setText(sipDesc);
   }
 
   /**

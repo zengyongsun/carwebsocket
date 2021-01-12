@@ -150,6 +150,11 @@ public class SPUtils {
     public static final String sip_domain = "sip_domain";
 
 
+    public static final String tcp_desc = "tcp_desc";
+    public static final String sip_desc = "sip_desc";
+    public static final String rtc_desc = "rtc_desc";
+
+
 
 
 }

@@ -410,6 +410,7 @@ public class LinphoneService extends Service implements SipSocketManger.SipSocke
 
   @Override
   public void onStartWebSocket(String result) {
+    SPUtils.put(this, SPUtils.sip_desc, result);
     android.util.Log.d("LinphoneService", "onStartWebSocket: " + result);
     Intent intent = new Intent(sipStateAction);
     intent.putExtra("result", result);
