@@ -18,6 +18,7 @@ import com.dm.carwebsocket.util.SPUtils;
 import com.dm.carwebsocket.websocket.SipDataBean;
 import com.dm.carwebsocket.websocket.SipSocketManger;
 
+import org.json.JSONException;
 import org.linphone.core.Address;
 import org.linphone.core.Call;
 import org.linphone.core.CallParams;
@@ -116,14 +117,22 @@ public class LinphoneService extends Service implements SipSocketManger.SipSocke
           SipDataBean bean = new SipDataBean();
           bean.action = action_incoming;
           bean.number = call.getRemoteAddress().getUsername();
-          sipSocketManger.sendMessageToAll(bean.calling());
+          try {
+            sipSocketManger.sendMessageToAll(bean.calling());
+          } catch (JSONException e) {
+            e.printStackTrace();
+          }
         } else if (state == Call.State.OutgoingRinging) {
           //呼叫，对方响铃
           SipDataBean bean = new SipDataBean();
           bean.action = action_call;
           bean.result = true;
           bean.desc = "响铃中";
-          sipSocketManger.sendMessageToAll(bean.respCall());
+          try {
+            sipSocketManger.sendMessageToAll(bean.respCall());
+          } catch (JSONException e) {
+            e.printStackTrace();
+          }
         } else if (state == Call.State.Connected) {
 //          core.setPlaybackDevice("STREAM_MUSIC");
           routeAudioToSpeaker();
@@ -134,11 +143,19 @@ public class LinphoneService extends Service implements SipSocketManger.SipSocke
           //接通状态
           SipDataBean bean = new SipDataBean();
           bean.action = action_connected;
-          sipSocketManger.sendMessageToAll(bean.connect());
+          try {
+            sipSocketManger.sendMessageToAll(bean.connect());
+          } catch (JSONException e) {
+            e.printStackTrace();
+          }
         } else if (state == Call.State.End) {
           SipDataBean bean = new SipDataBean();
           bean.action = action_hang_up;
-          sipSocketManger.sendMessageToAll(bean.connect());
+          try {
+            sipSocketManger.sendMessageToAll(bean.connect());
+          } catch (JSONException e) {
+            e.printStackTrace();
+          }
         }
 
         if (state == Call.State.Error) {
@@ -147,11 +164,19 @@ public class LinphoneService extends Service implements SipSocketManger.SipSocke
             bean.action = action_call;
             bean.result = false;
             bean.desc = "对方拒绝";
-            sipSocketManger.sendMessageToAll(bean.respCall());
+            try {
+              sipSocketManger.sendMessageToAll(bean.respCall());
+            } catch (JSONException e) {
+              e.printStackTrace();
+            }
           } else {
             bean.action = action_error;
             bean.reason = message;
-            sipSocketManger.sendMessageToAll(bean.respError());
+            try {
+              sipSocketManger.sendMessageToAll(bean.respError());
+            } catch (JSONException e) {
+              e.printStackTrace();
+            }
           }
         }
         last = state;
@@ -391,7 +416,11 @@ public class LinphoneService extends Service implements SipSocketManger.SipSocke
         bean.state = "Error";
         break;
     }
-    sipSocketManger.sendMessageToAll(bean.respState());
+    try {
+      sipSocketManger.sendMessageToAll(bean.respState());
+    } catch (JSONException e) {
+      e.printStackTrace();
+    }
   }
 
   public void acceptPhone() {
