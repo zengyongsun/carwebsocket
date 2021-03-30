@@ -2,7 +2,5 @@
     <string name="app_name">车载服务器</string>
     <string name="app_id">5fab744f</string>
 
-    <string
-        name="tts_toast_format"
-        formatted="false">缓冲进度为%d%%，播放进度为%d%%</string>
+    <string name="tts_toast_format" formatted="false">缓冲进度为%d%%，播放进度为%d%%</string>
 </resources>

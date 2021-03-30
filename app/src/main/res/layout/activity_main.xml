@@ -8,6 +8,16 @@
 
 
     <TextView
+        android:id="@+id/tvVersion"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="5dp"
+        android:textSize="16sp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="2.0.1" />
+
+    <TextView
         android:id="@+id/ipValue"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -46,6 +56,16 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toLeftOf="@+id/SipSettings"
         app:layout_constraintTop_toBottomOf="@+id/btVoice" />
+
+    <Button
+        android:id="@+id/showLog"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:text="GPS日志"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toLeftOf="@+id/SipSettings"
+        app:layout_constraintTop_toBottomOf="@+id/goSettings" />
 
     <Button
         android:id="@+id/SipSettings"
@@ -108,9 +128,9 @@
         android:id="@+id/tvMsg"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="50dp"
         android:paddingLeft="10dp"
         android:paddingRight="10dp"
-        android:layout_marginTop="50dp"
         android:text="注意：RTK的TCP-IP是用来连接接收RTK的GPS数据，这个IP需要与RTK模块IP一样才能连接成功"
         android:textStyle="bold"
         app:layout_constraintLeft_toLeftOf="parent"

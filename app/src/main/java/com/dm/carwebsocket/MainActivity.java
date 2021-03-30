@@ -19,6 +19,7 @@ import com.dm.carwebsocket.settings.SettingsActivity;
 import com.dm.carwebsocket.sip.ConfigureAccountActivity;
 import com.dm.carwebsocket.sip.InfoSipActivity;
 import com.dm.carwebsocket.sip.LinphoneService;
+import com.dm.carwebsocket.util.AppUtils;
 import com.dm.carwebsocket.util.IPUtils;
 import com.dm.carwebsocket.util.SPUtils;
 import com.iflytek.cloud.ErrorCode;
@@ -26,7 +27,6 @@ import com.iflytek.cloud.InitListener;
 import com.iflytek.cloud.SpeechConstant;
 import com.iflytek.cloud.SpeechSynthesizer;
 import com.iflytek.cloud.util.ResourceUtil;
-import com.tencent.bugly.beta.Beta;
 
 import java.util.ArrayList;
 
@@ -35,6 +35,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
   private static final String TAG = MainActivity.class.getSimpleName();
 
   private TextView socketState;
+  private TextView tvVersion;
   private TextView tcpState;
   private TextView voiceState;
   private TextView ipValueTv;
@@ -58,6 +59,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
   }
 
   private void intiView() {
+    tvVersion = findViewById(R.id.tvVersion);
     ipValueTv = findViewById(R.id.ipValue);
     tpcIPTv = findViewById(R.id.tcpIp);
     voiceState = findViewById(R.id.voiceState);
@@ -69,6 +71,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     findViewById(R.id.goSettings).setOnClickListener(this);
     findViewById(R.id.SipSettings).setOnClickListener(this);
     findViewById(R.id.SipClear).setOnClickListener(this);
+    findViewById(R.id.showLog).setOnClickListener(this);
 
     String tcpDesc = (String) SPUtils.get(this, SPUtils.tcp_desc, "");
     String sipDesc = (String) SPUtils.get(this, SPUtils.sip_desc, "");
@@ -96,6 +99,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     ipValueTv.setText("本机IP：" + IPUtils.getLocalIp());
     tpcIPTv.setText("RTK模块IP：" + SPUtils.get(this, SPUtils.gps_tcp_ip,
             SPUtils.tcp_ip_default_value));
+    tvVersion.setText(AppUtils.getVersionName(this));
   }
 
   @Override
@@ -193,7 +197,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     switch (id) {
       case R.id.btVoice:
         voice();
-        Beta.checkUpgrade(false,false);
         break;
       case R.id.goSettings:
         startActivity(new Intent(MainActivity.this, SettingsActivity.class));
@@ -204,6 +207,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
       case R.id.SipClear:
         startActivity(new Intent(MainActivity.this, InfoSipActivity.class));
         break;
+      case R.id.showLog:
+        startActivity(new Intent(MainActivity.this, ShowLogActivity.class));
     }
   }
 

@@ -75,7 +75,7 @@ public class WebSocketService extends Service
         serviceManager.start(7890);
         serviceManager.setReceiveData(this);
 
-        clientSocket = new ClientSocket();
+        clientSocket = ClientSocket.getInstance();
         clientSocket.setState(this);
         clientSocket.setSocketDataParser(this);
         createConnect(clientSocket);
@@ -224,5 +224,10 @@ public class WebSocketService extends Service
     public void socketDisconnect() {
         //socket连接断开的回调
         createConnect(clientSocket);
+    }
+
+    @Override
+    public void message(String str) {
+
     }
 }

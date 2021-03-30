@@ -6,29 +6,44 @@ import java.io.*;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ClientSocket {
 
     public interface ConnectState {
         void socketDisconnect();
+
+        void message(String str);
     }
 
     private static final String TAG = ClientSocket.class.getSimpleName();
+
+
     private Socket mSocket = null;
     private InputStream mInputStream;
     private OutputStream mOutputStream;
     private DealWidth mDealWidth;
 
-    private ConnectState mState;
+    private List<ConnectState> mState = new ArrayList<>();
 
     public void setState(ConnectState mState) {
-        this.mState = mState;
+        this.mState.add(mState);
     }
 
-    public ClientSocket() {
-
+    public void removeState(ConnectState mState) {
+        this.mState.remove(mState);
     }
 
+    private static ClientSocket instance = new ClientSocket();
+
+    private ClientSocket() {
+//        new ProcessThread2().start();
+    }
+
+    public static ClientSocket getInstance() {
+        return instance;
+    }
 
     private SocketDataParser mSocketDataParser;
 
@@ -129,17 +144,60 @@ public class ClientSocket {
                     try {
                         while ((data = br.readLine()) != null) {
                             DealWidth.this.parser.dataParser(data);
+                            for (ConnectState item : mState) {
+                                item.message(data);
+                            }
                         }
                     } catch (SocketException e) {
                         Log.d(TAG, "run:SocketException:" + e.getMessage());
                         if (mState != null) {
-                            mState.socketDisconnect();
+
+                            for (ConnectState item : mState) {
+                                item.socketDisconnect();
+                            }
                             disConnect();
                         }
                     } catch (Exception e) {
                         e.printStackTrace();
                         Log.d(TAG, "run:Exception" + e.getMessage());
+                        if (mState != null) {
+                            for (ConnectState item : mState) {
+                                item.socketDisconnect();
+                            }
+                            disConnect();
+                        }
                     }
+                }
+            }
+        }
+
+
+    }
+
+    private class ProcessThread2 extends Thread {
+
+        private boolean isRunning;
+
+        public ProcessThread2() {
+            this.isRunning = true;
+        }
+
+        public void setRunning(boolean running) {
+            isRunning = running;
+        }
+
+        @Override
+        public void run() {
+            while (isRunning) {
+                String str = "$KSXT,20201222075720.00,119.17084152,32.07387900,83.5770,269.94,1.19,207.28,0.001,,3,3,25,25,-3.617,-4.468,-7.860,-0.000,-0.001,-0.022,1.0,56,*33736701";
+                for (ConnectState item : mState) {
+                    item.message(str);
+                }
+                Log.d(TAG, "run: 运行了");
+                try {
+                    sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
                 }
             }
         }
