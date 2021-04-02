@@ -2,19 +2,24 @@ package com.dm.carwebsocket.gps;
 
 import android.util.Log;
 
+import com.google.gson.Gson;
+
 import java.io.*;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Observer;
 
 public class ClientSocket {
 
     public interface ConnectState {
         void socketDisconnect();
 
-        void message(String str);
+        void dataParserError(String str);
+
+        void message(byte[] str);
     }
 
     private static final String TAG = ClientSocket.class.getSimpleName();
@@ -45,10 +50,17 @@ public class ClientSocket {
         return instance;
     }
 
-    private SocketDataParser mSocketDataParser;
 
-    public void setSocketDataParser(SocketDataParser mSocketDataParser) {
-        this.mSocketDataParser = mSocketDataParser;
+    public void registerObserver(Observer observer) {
+        if (this.mDealWidth != null) {
+            this.mDealWidth.registerObserver(observer);
+        }
+    }
+
+    public void unRegisterObserver(Observer observer) {
+        if (this.mDealWidth != null) {
+            this.mDealWidth.unRegisterObserver(observer);
+        }
     }
 
     public boolean createConnect(String host, int port) {
@@ -56,6 +68,7 @@ public class ClientSocket {
         try {
             this.mSocket = new Socket();
             this.mSocket.connect(new InetSocketAddress(host, port), 5000);
+
         } catch (IOException e) {
             e.printStackTrace();
             return false;
@@ -63,7 +76,8 @@ public class ClientSocket {
         try {
             this.mInputStream = mSocket.getInputStream();
             this.mOutputStream = mSocket.getOutputStream();
-            this.mDealWidth = new DealWidth(this.mInputStream, this.mOutputStream, this.mSocketDataParser);
+            this.mDealWidth = new DealWidth(this.mSocket, this.mInputStream, this.mOutputStream,
+                    new ReaderDataPackageParser(), new ReaderDataPackageProcess());
         } catch (Exception e) {
             e.printStackTrace();
             return false;
@@ -76,6 +90,7 @@ public class ClientSocket {
         try {
             if (mDealWidth != null) {
                 mDealWidth.singOut();
+                mDealWidth = null;
             }
             if (mSocket != null) {
                 mSocket.close();
@@ -87,15 +102,21 @@ public class ClientSocket {
 
     public class DealWidth {
         private ProcessThread processThread = null;
+//        private ConnectThread connectThread = null;
         private InputStream in;
         private OutputStream out;
-        private SocketDataParser parser;
+        private Socket mSocket;
+        private ReaderDataPackageParser mPackageParser;
+        private DataPackageProcess mPackageProcess;
 
-        public DealWidth(InputStream in, OutputStream out, SocketDataParser parser) throws Exception {
+        public DealWidth(Socket mSocket, InputStream in, OutputStream out, ReaderDataPackageParser parser,
+                         DataPackageProcess process) throws Exception {
+            this.mSocket = mSocket;
             this.in = in;
             this.out = out;
             if (parser != null) {
-                this.parser = parser;
+                this.mPackageParser = parser;
+                this.mPackageProcess = process;
                 this.startThread();
             } else {
                 throw new Exception("no SocketDataParser");
@@ -105,6 +126,16 @@ public class ClientSocket {
         public void startThread() {
             this.processThread = new ProcessThread();
             this.processThread.start();
+//            this.connectThread = new ConnectThread();
+//            this.connectThread.start();
+        }
+
+        public void registerObserver(Observer observer) {
+            this.mPackageProcess.addObserver(observer);
+        }
+
+        public void unRegisterObserver(Observer observer) {
+            this.mPackageProcess.deleteObserver(observer);
         }
 
         public void singOut() {
@@ -118,6 +149,9 @@ public class ClientSocket {
                 if (processThread != null) {
                     processThread.setRunning(false);
                 }
+//                if (connectThread != null) {
+//                    connectThread.setRunning(false);
+//                }
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -138,20 +172,21 @@ public class ClientSocket {
             @Override
             public void run() {
                 while (isRunning) {
-                    InputStreamReader inputStreamReader = new InputStreamReader(DealWidth.this.in);
-                    BufferedReader br = new BufferedReader(inputStreamReader);
-                    String data = null;
+                    byte[] btAryBuffer = new byte[1024];
                     try {
-                        while ((data = br.readLine()) != null) {
-                            DealWidth.this.parser.dataParser(data);
+                        int nLenRead = DealWidth.this.in.read(btAryBuffer);
+                        if (nLenRead > 0) {
+                            byte[] btAryReceiveData = new byte[nLenRead];
+                            System.arraycopy(btAryBuffer, 0, btAryReceiveData, 0, nLenRead);
                             for (ConnectState item : mState) {
-                                item.message(data);
+                                item.message(btAryReceiveData);
                             }
+                            DealWidth.this.mPackageParser.runReceiveDataCallback(btAryReceiveData,
+                                    DealWidth.this.mPackageProcess);
                         }
-                    } catch (SocketException e) {
+                    } catch (IOException e) {
                         Log.d(TAG, "run:SocketException:" + e.getMessage());
                         if (mState != null) {
-
                             for (ConnectState item : mState) {
                                 item.socketDisconnect();
                             }
@@ -162,7 +197,7 @@ public class ClientSocket {
                         Log.d(TAG, "run:Exception" + e.getMessage());
                         if (mState != null) {
                             for (ConnectState item : mState) {
-                                item.socketDisconnect();
+                                item.dataParserError(e.getMessage());
                             }
                             disConnect();
                         }
@@ -171,36 +206,43 @@ public class ClientSocket {
             }
         }
 
+        private class ConnectThread extends Thread {
 
-    }
+            private boolean isRunning;
 
-    private class ProcessThread2 extends Thread {
+            public ConnectThread() {
+                this.isRunning = true;
+            }
 
-        private boolean isRunning;
+            public void setRunning(boolean running) {
+                isRunning = running;
+            }
 
-        public ProcessThread2() {
-            this.isRunning = true;
-        }
-
-        public void setRunning(boolean running) {
-            isRunning = running;
-        }
-
-        @Override
-        public void run() {
-            while (isRunning) {
-                String str = "$KSXT,20201222075720.00,119.17084152,32.07387900,83.5770,269.94,1.19,207.28,0.001,,3,3,25,25,-3.617,-4.468,-7.860,-0.000,-0.001,-0.022,1.0,56,*33736701";
-                for (ConnectState item : mState) {
-                    item.message(str);
-                }
-                Log.d(TAG, "run: 运行了");
-                try {
-                    sleep(1000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
+            @Override
+            public void run() {
+                while (isRunning) {
+                    try {
+                        DealWidth.this.out.write(1); // 发送心跳包
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        if (mState != null) {
+                            for (ConnectState item : mState) {
+                                item.socketDisconnect();
+                            }
+                            disConnect();
+                        }
+                        System.out.println("IOException！");
+                    }
+                    System.out.println("目前是正常的！");
+                    try {
+                        Thread.sleep(3 * 1000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         }
     }
+
 }
 

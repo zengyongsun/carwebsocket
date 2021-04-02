@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -13,11 +14,12 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.dm.carwebsocket.gps.ClientSocket;
+import com.dm.carwebsocket.gps.RXObserver;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class ShowLogActivity extends AppCompatActivity implements ClientSocket.ConnectState {
+public class ShowLogActivity extends AppCompatActivity  {
 
     private RecyclerView recyclerView;
     private LogAdapter adapter;
@@ -31,25 +33,19 @@ public class ShowLogActivity extends AppCompatActivity implements ClientSocket.C
         LinearLayoutManager manager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(manager);
         recyclerView.setAdapter(adapter);
-        ClientSocket.getInstance().setState(this);
+        ClientSocket.getInstance().registerObserver(rxObserver);
     }
-
-
-    @Override
-    public void socketDisconnect() {
-
-    }
-
-    @Override
-    public void message(final String str) {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                Log.d("ShowLogActivity", "run: ShowLogActivity");
-                adapter.addItem(new LogBean(System.currentTimeMillis(), str));
-            }
-        });
-    }
+    RXObserver rxObserver = new RXObserver() {
+        @Override
+        public void analysisData(final String msgTran) {
+            runOnUiThread(new Runnable(){
+                @Override
+                public void run() {
+                    adapter.addItem(new LogBean(System.currentTimeMillis(),msgTran));
+                }
+            });
+        }
+    };
 
 
     private static class LogAdapter extends RecyclerView.Adapter<LogViewHolder> {
@@ -98,6 +94,6 @@ public class ShowLogActivity extends AppCompatActivity implements ClientSocket.C
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        ClientSocket.getInstance().removeState(this);
+        ClientSocket.getInstance().unRegisterObserver(rxObserver);
     }
 }

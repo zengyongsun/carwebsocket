@@ -8,8 +8,8 @@ android {
         applicationId "com.dm.carwebsocket"
         minSdkVersion 22
         targetSdkVersion 30
-        versionCode 340
-        versionName "3.4.0"
+        versionCode 341
+        versionName "3.4.1"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
@@ -56,6 +56,7 @@ dependencies {
     implementation 'androidx.constraintlayout:constraintlayout:2.0.2'
     implementation files('libs/Msc.jar')
     implementation 'androidx.annotation:annotation:1.1.0'
+    implementation project(path: ':update-app')
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
@@ -67,5 +68,5 @@ dependencies {
     implementation "androidx.lifecycle:lifecycle-viewmodel:$lifecycle_version"
     // LiveData
     implementation "androidx.lifecycle:lifecycle-livedata:$lifecycle_version"
-
+    implementation 'com.lzy.net:okgo:3.0.4'
 }
