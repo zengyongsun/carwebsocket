@@ -1,8 +1,8 @@
 package com.vector.update_app.utils;
 
+
 import android.app.Activity;
 import android.app.ActivityManager;
-import android.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -23,6 +23,7 @@ import android.util.DisplayMetrics;
 
 import androidx.annotation.NonNull;
 import androidx.core.content.FileProvider;
+import androidx.fragment.app.Fragment;
 
 import com.vector.update_app.UpdateAppBean;
 import com.vector.update_app.listener.ExceptionHandler;

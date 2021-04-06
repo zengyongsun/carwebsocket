@@ -25,7 +25,6 @@ import com.dm.carwebsocket.util.AppUtils;
 import com.dm.carwebsocket.util.IPUtils;
 import com.dm.carwebsocket.util.OkGoUpdateHttpUtil;
 import com.dm.carwebsocket.util.SPUtils;
-import com.dm.carwebsocket.util.Urls;
 import com.iflytek.cloud.ErrorCode;
 import com.iflytek.cloud.InitListener;
 import com.iflytek.cloud.SpeechConstant;
@@ -114,7 +113,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         tpcIPTv.setText("RTK模块IP：" + SPUtils.get(this, SPUtils.gps_tcp_ip,
                 SPUtils.tcp_ip_default_value));
         tvVersion.setText(AppUtils.getVersionName(this));
-//        isNeedUpdate();
+        isNeedUpdate();
     }
 
     @Override
@@ -314,6 +313,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void checkUpdate() {
+        String host_ip = "http://" + SPUtils.get(this, SPUtils.UPDATE_IP, SPUtils.update_ip_default_value) + ":"
+                + SPUtils.get(this, SPUtils.UPDATE_PORT, SPUtils.update_port_default_value);
+        String url = "/update_message.json";
         String path = "";
         if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED) ||
                 !Environment.isExternalStorageRemovable()) {
@@ -333,72 +335,74 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 //当前Activity
                 .setActivity(this)
                 //更新地址
-                .setUpdateUrl(Urls.host_ip + Urls.app_update_url)
+                .setUpdateUrl(host_ip + url)
                 //实现httpManager接口的对象
                 .setHttpManager(new OkGoUpdateHttpUtil())
                 //apk的保存路径
                 .setTargetPath(path)
-                .build()
-                .checkNewApp(new UpdateCallback() {
-                    @Override
-                    protected void hasNewApp(UpdateAppBean updateApp, UpdateAppManager updateAppManager) {
-                        if (!AppUtils.needUpdate(MainActivity.this, updateApp.getNewVersion())) {
-                            return;
-                        }
-                        //添加信息
-                        final UpdateAppBean updateAppBean = updateAppManager.fillUpdateAppData();
-                        //设置不显示通知栏下载进度
-                        updateAppBean.dismissNotificationProgress(true);
-
-                        final File appFile = AppUpdateUtils.getAppFile(updateAppBean);
-                        String md5 = getFileMD5(appFile);
-                      Log.d("UpdateAppManager", "文件 md5 = " + md5 + "服务器 md5 = " + updateAppBean.getNewMd5());
-                        if (updateAppBean.getNewMd5().equalsIgnoreCase(md5)) {
-                            AppUtils.installApp(appFile.getAbsolutePath());
-                        } else {
-                            updateAppManager.download(new DownloadService.DownloadCallback() {
-                                @Override
-                                public void onStart() {
-
-                                }
-
-                                @Override
-                                public void onProgress(float progress, long totalSize) {
-
-                                }
-
-                                @Override
-                                public void setMax(long totalSize) {
-
-                                }
-
-                                @Override
-                                public boolean onFinish(File file) {
-                                    String md5 = getFileMD5(appFile);
-                                    if (updateAppBean.getNewMd5().equalsIgnoreCase(md5)) {
-                                        Log.d("UpdateAppManager", file.getAbsolutePath());
-                                        AppUtils.installApp(file.getAbsolutePath());
-                                    } else {
-                                        Log.d("UpdateAppManager", "下载的文件md5匹配不上");
-                                    }
-                                    return false;
-                                }
-
-
-                                @Override
-                                public void onError(String msg) {
-
-                                }
-
-                                @Override
-                                public boolean onInstallAppAndAppOnForeground(File file) {
-                                    return false;
-                                }
-                            });
-                        }
-
-                    }
-                });
+                .build().update();
+//                .checkNewApp(new UpdateCallback() {
+//                    @Override
+//                    protected void hasNewApp(UpdateAppBean updateApp, UpdateAppManager updateAppManager) {
+//                        Log.d(TAG, "hasNewApp: "+updateApp.toString());
+//
+//                        if (!AppUtils.needUpdate(MainActivity.this, updateApp.getNewVersion())) {
+//                            return;
+//                        }
+//                        //添加信息
+//                        final UpdateAppBean updateAppBean = updateAppManager.fillUpdateAppData();
+//                        //设置不显示通知栏下载进度
+//                        updateAppBean.dismissNotificationProgress(true);
+//
+//                        final File appFile = AppUpdateUtils.getAppFile(updateAppBean);
+//                        String md5 = getFileMD5(appFile);
+//                        Log.d("UpdateAppManager", "文件 md5 = " + md5 + "服务器 md5 = " + updateAppBean.getNewMd5());
+//                        if (updateAppBean.getNewMd5().equalsIgnoreCase(md5)) {
+//                            AppUtils.installApp(appFile.getAbsolutePath());
+//                        } else {
+//                            updateAppManager.download(new DownloadService.DownloadCallback() {
+//                                @Override
+//                                public void onStart() {
+//
+//                                }
+//
+//                                @Override
+//                                public void onProgress(float progress, long totalSize) {
+//
+//                                }
+//
+//                                @Override
+//                                public void setMax(long totalSize) {
+//
+//                                }
+//
+//                                @Override
+//                                public boolean onFinish(File file) {
+//                                    String md5 = getFileMD5(appFile);
+//                                    if (updateAppBean.getNewMd5().equalsIgnoreCase(md5)) {
+//                                        Log.d("UpdateAppManager", file.getAbsolutePath());
+//                                        AppUtils.installApp(file.getAbsolutePath());
+//                                    } else {
+//                                        Log.d("UpdateAppManager", "下载的文件md5匹配不上");
+//                                    }
+//                                    return false;
+//                                }
+//
+//
+//                                @Override
+//                                public void onError(String msg) {
+//
+//                                }
+//
+//                                @Override
+//                                public boolean onInstallAppAndAppOnForeground(File file) {
+//                                    return false;
+//                                }
+//                            });
+//                        }
+//
+//                    }
+//                });
 
     }
 

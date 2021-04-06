@@ -25,6 +25,12 @@ android {
         }
     }
     signingConfigs {
+        debug {
+            keyAlias 'carsm'
+            keyPassword 'sm2020'
+            storeFile file('carwebsocket.jks')
+            storePassword 'sm2020'
+        }
 
         release {
             keyAlias 'carsm'
@@ -45,6 +51,7 @@ android {
             dirs 'libs'   // aar目录
         }
     }
+
 
 }
 

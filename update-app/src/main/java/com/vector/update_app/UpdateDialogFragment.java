@@ -1,9 +1,11 @@
 package com.vector.update_app;
 
 import android.Manifest;
+
+
+import androidx.fragment.app.FragmentActivity;
+
 import android.app.Activity;
-import android.app.DialogFragment;
-import android.app.FragmentManager;
 import android.content.ComponentName;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -33,6 +35,8 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.core.app.ActivityCompat;
+import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.FragmentManager;
 
 import com.vector.update_app.listener.ExceptionHandler;
 import com.vector.update_app.listener.ExceptionHandlerHelper;

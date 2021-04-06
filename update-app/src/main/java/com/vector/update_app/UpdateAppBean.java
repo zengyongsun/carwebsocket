@@ -192,4 +192,16 @@ public class UpdateAppBean implements Serializable {
         return this;
     }
 
+    @Override
+    public String toString() {
+        return "UpdateAppBean{" +
+                "update='" + update + '\'' +
+                ", new_version='" + new_version + '\'' +
+                ", apk_file_url='" + apk_file_url + '\'' +
+                ", update_log='" + update_log + '\'' +
+                ", target_size='" + target_size + '\'' +
+                ", new_md5='" + new_md5 + '\'' +
+                ", delta=" + delta +
+                '}';
+    }
 }

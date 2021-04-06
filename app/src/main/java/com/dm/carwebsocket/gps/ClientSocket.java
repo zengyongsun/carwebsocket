@@ -2,12 +2,9 @@ package com.dm.carwebsocket.gps;
 
 import android.util.Log;
 
-import com.google.gson.Gson;
-
 import java.io.*;
 import java.net.InetSocketAddress;
 import java.net.Socket;
-import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Observer;
@@ -15,9 +12,7 @@ import java.util.Observer;
 public class ClientSocket {
 
     public interface ConnectState {
-        void socketDisconnect();
-
-        void dataParserError(String str);
+        void reconnect();
 
         void message(byte[] str);
     }
@@ -188,7 +183,7 @@ public class ClientSocket {
                         Log.d(TAG, "run:SocketException:" + e.getMessage());
                         if (mState != null) {
                             for (ConnectState item : mState) {
-                                item.socketDisconnect();
+                                item.reconnect();
                             }
                             disConnect();
                         }
@@ -197,7 +192,7 @@ public class ClientSocket {
                         Log.d(TAG, "run:Exception" + e.getMessage());
                         if (mState != null) {
                             for (ConnectState item : mState) {
-                                item.dataParserError(e.getMessage());
+                                item.reconnect();
                             }
                             disConnect();
                         }
@@ -227,7 +222,7 @@ public class ClientSocket {
                         e.printStackTrace();
                         if (mState != null) {
                             for (ConnectState item : mState) {
-                                item.socketDisconnect();
+                                item.reconnect();
                             }
                             disConnect();
                         }

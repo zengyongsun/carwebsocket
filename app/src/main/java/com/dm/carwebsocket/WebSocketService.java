@@ -233,20 +233,14 @@ public class WebSocketService extends Service
     private SpeechSynthesizer mTts;
 
     @Override
-    public void socketDisconnect() {
+    public void reconnect() {
         //socket连接断开的回调
         createConnect(clientSocket);
-    }
-
-    @Override
-    public void dataParserError(String str) {
-
     }
 
     @Override
     public void message(byte[] str) {
 
     }
-
 
 }

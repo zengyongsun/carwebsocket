@@ -155,8 +155,10 @@ public class SPUtils {
     public static final String rtc_desc = "rtc_desc";
 
 
-    public static final String SERVICE_IP = "service_ip";
-    public static final String SERVICE_PORT = "service_port";
+    public static final String UPDATE_IP = "service_ip";
+    public static final String update_ip_default_value = "221.131.74.200";
+    public static final String UPDATE_PORT = "service_port";
+    public static final String update_port_default_value = "8010";
 
 }
 

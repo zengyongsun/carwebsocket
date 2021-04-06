@@ -12,11 +12,11 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
 
+
 import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.FragmentActivity;
-
 
 import com.vector.update_app.listener.ExceptionHandler;
 import com.vector.update_app.listener.ExceptionHandlerHelper;
@@ -188,10 +188,10 @@ public class UpdateAppManager {
                 bundle.putInt(TOP_IMAGE_KEY, mTopPic);
             }
 
-//            UpdateDialogFragment
-//                    .newInstance(bundle)
-//                    .setUpdateDialogFragmentListener(mUpdateDialogFragmentListener)
-//                    .show(((FragmentActivity) mActivity).getSupportFragmentManager(), "dialog");
+            UpdateDialogFragment
+                    .newInstance(bundle)
+                    .setUpdateDialogFragmentListener(mUpdateDialogFragmentListener)
+                    .show(((FragmentActivity) mActivity).getSupportFragmentManager(), "dialog");
 
         }
 
