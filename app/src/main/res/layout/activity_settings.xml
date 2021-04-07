@@ -13,10 +13,10 @@
         android:layout_height="wrap_content"
         android:text="RTK模块的IP："
         android:textSize="16sp"
-        app:layout_constraintHorizontal_chainStyle="packed"
-        app:layout_constraintRight_toLeftOf="@+id/gpsIp"
         app:layout_constraintBottom_toBottomOf="@+id/btGps"
+        app:layout_constraintHorizontal_chainStyle="packed"
         app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toLeftOf="@+id/gpsIp"
         app:layout_constraintTop_toTopOf="@+id/btGps" />
 
     <EditText
@@ -28,19 +28,80 @@
         android:paddingLeft="5dp"
         android:paddingRight="5dp"
         android:text="192.168.100.100"
-        app:layout_constraintRight_toLeftOf="@id/btGps"
         app:layout_constraintBottom_toBottomOf="@+id/btGps"
         app:layout_constraintLeft_toRightOf="@+id/tvGps"
+        app:layout_constraintRight_toLeftOf="@id/btGps"
         app:layout_constraintTop_toTopOf="@+id/btGps" />
 
     <Button
         android:id="@+id/btGps"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintRight_toRightOf="parent"
         android:text="确定"
         app:layout_constraintLeft_toRightOf="@+id/gpsIp"
+        app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+
+    <TextView
+        android:id="@+id/tvUpdate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="80dp"
+        android:text="更新IP："
+        android:textSize="16sp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toLeftOf="@+id/updateIp"
+        app:layout_constraintTop_toBottomOf="@+id/tvGps" />
+
+    <EditText
+        android:id="@+id/updateIp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:minWidth="150dp"
+        android:paddingLeft="5dp"
+        android:paddingRight="5dp"
+        android:text="192.168.100.100"
+        app:layout_constraintBottom_toBottomOf="@id/tvUpdate"
+        app:layout_constraintLeft_toRightOf="@+id/tvUpdate"
+        app:layout_constraintRight_toLeftOf="@+id/btUpdate"
+        app:layout_constraintTop_toTopOf="@+id/tvUpdate" />
+
+    <Button
+        android:id="@+id/btUpdate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="确定"
+        android:layout_marginRight="10dp"
+        app:layout_constraintBottom_toBottomOf="@+id/tvPort"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/tvUpdate" />
+
+    <TextView
+        android:id="@+id/tvPort"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:text="更新Port："
+        android:textSize="16sp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toLeftOf="@id/updatePort"
+        app:layout_constraintTop_toBottomOf="@+id/tvUpdate" />
+
+    <EditText
+        android:id="@+id/updatePort"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:minWidth="150dp"
+        android:paddingLeft="5dp"
+        android:paddingRight="5dp"
+        android:text="192.168.100.100"
+        app:layout_constraintBottom_toBottomOf="@id/tvPort"
+        app:layout_constraintLeft_toRightOf="@+id/tvPort"
+        app:layout_constraintRight_toLeftOf="@+id/btUpdate"
+        app:layout_constraintTop_toTopOf="@+id/tvPort" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

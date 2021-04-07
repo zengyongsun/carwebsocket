@@ -15,6 +15,7 @@ import androidx.annotation.Nullable;
 import com.dm.carwebsocket.gps.ClientSocket;
 import com.dm.carwebsocket.gps.GpRmcBean;
 import com.dm.carwebsocket.gps.KSXTBean;
+import com.dm.carwebsocket.gps.RXObserver;
 import com.dm.carwebsocket.gps.SocketDataParser;
 import com.dm.carwebsocket.util.SPUtils;
 import com.dm.carwebsocket.websocket.ServiceManager;
@@ -75,14 +76,23 @@ public class WebSocketService extends Service
         serviceManager.start(7890);
         serviceManager.setReceiveData(this);
 
-        clientSocket = new ClientSocket();
+        clientSocket = ClientSocket.getInstance();
         clientSocket.setState(this);
-        clientSocket.setSocketDataParser(this);
+
         createConnect(clientSocket);
 
         // 初始化语音合成对象
         mTts = SpeechSynthesizer.createSynthesizer(this, null);
+
     }
+
+    RXObserver rxObserver = new RXObserver() {
+        @Override
+        public void analysisData(String msgTran) {
+            Log.d(TAG, "analysisData: "+Thread.currentThread());
+            serviceManager.sendMessageToAll(parseKSXTToJson(msgTran));
+        }
+    };
 
     private void createConnect(final ClientSocket clientSocket) {
         new Thread(new Runnable() {
@@ -91,11 +101,13 @@ public class WebSocketService extends Service
                 boolean ok = true;
                 String host = (String) SPUtils.get(WebSocketService.this,
                         SPUtils.gps_tcp_ip, SPUtils.tcp_ip_default_value);
+//                String host = "192.168.4.7";
 //                String host = "221.131.74.200";
                 while (ok) {
                     if (clientSocket.createConnect(host, 4444)) {
                         ok = false;
                         tcpState("车载服务器：RTC的TCP连接成功");
+                        clientSocket.registerObserver(rxObserver);
                     } else {
                         host = (String) SPUtils.get(WebSocketService.this,
                                 SPUtils.gps_tcp_ip, SPUtils.tcp_ip_default_value);
@@ -221,8 +233,14 @@ public class WebSocketService extends Service
     private SpeechSynthesizer mTts;
 
     @Override
-    public void socketDisconnect() {
+    public void reconnect() {
         //socket连接断开的回调
         createConnect(clientSocket);
     }
+
+    @Override
+    public void message(byte[] str) {
+
+    }
+
 }
