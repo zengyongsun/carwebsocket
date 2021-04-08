@@ -98,6 +98,4 @@ public class ServiceManager implements SocketManager {
 
     void onStartWebSocket(String result);
   }
-
-
 }

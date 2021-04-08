@@ -78,6 +78,16 @@
         app:layout_constraintTop_toBottomOf="@+id/btVoice" />
 
     <Button
+        android:id="@+id/update"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:text="检测更新"
+        app:layout_constraintLeft_toRightOf="@+id/goSettings"
+        app:layout_constraintRight_toLeftOf="@+id/SipClear"
+        app:layout_constraintTop_toBottomOf="@+id/SipSettings" />
+
+    <Button
         android:id="@+id/SipClear"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

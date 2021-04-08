@@ -12,6 +12,7 @@ import android.os.Binder;
 import android.os.IBinder;
 
 import android.text.TextUtils;
+import android.widget.Toast;
 
 
 import androidx.annotation.Nullable;
@@ -277,7 +278,7 @@ public class DownloadService extends Service {
 
         @Override
         public void onError(String error) {
-//            Toast.makeText(DownloadService.this, "更新新版本出错，" + error, Toast.LENGTH_SHORT).show();
+            Toast.makeText(DownloadService.this, "更新新版本出错，" + error, Toast.LENGTH_SHORT).show();
             //App前台运行
             if (mCallBack != null) {
                 mCallBack.onError(error);

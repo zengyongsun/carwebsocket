@@ -53,4 +53,6 @@ public class KSXTBean {
         differentialAge = temp[20];
     }
 
+    public KSXTBean() {
+    }
 }

@@ -40,9 +40,6 @@ public class ReaderDataPackageParser {
                         nIndex = nLoop;
                         nLoop += 4;
                     }
-//                    else {
-//                        nMarkIndex = nLoop;
-//                    }
 
                     //结束位
                     if (btAryBuffer[nLoop] == 42) {
