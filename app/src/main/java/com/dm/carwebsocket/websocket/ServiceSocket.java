@@ -28,7 +28,7 @@ public class ServiceSocket extends WebSocketServer {
 
   @Override
   public void onOpen(WebSocket conn, ClientHandshake handshake) {
-    Log.d(TAG, "onOpen: " + conn);
+    Log.d(TAG, "onOpen==: " + conn);
     socketManager.userLogin(conn);
   }
 
@@ -53,7 +53,7 @@ public class ServiceSocket extends WebSocketServer {
   @Override
   public void onStart() {
     //启动成功时调用
-    Log.d(TAG, "onStart: ");
+    Log.d(TAG, "onStart==: ");
     socketManager.onStart();
   }
 }

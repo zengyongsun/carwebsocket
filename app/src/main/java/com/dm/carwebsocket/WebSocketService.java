@@ -24,6 +24,9 @@ import com.iflytek.cloud.SpeechConstant;
 import com.iflytek.cloud.SpeechSynthesizer;
 import com.iflytek.cloud.util.ResourceUtil;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 /**
  * author : Zeyo
  * e-mail : zengyongsun@163.com
@@ -40,7 +43,7 @@ public class WebSocketService extends Service
     public static final String webSocketStateAction = "com.dm.carwebsocket.websocket_state";
     public static final String tcpStateAction = "com.dm.carwebsocket.tcp_state";
     private ClientSocket clientSocket;
-
+    ExecutorService executorService =  Executors.newFixedThreadPool(3);
     @Override
     public void onCreate() {
         super.onCreate();
@@ -56,6 +59,7 @@ public class WebSocketService extends Service
 
         // 初始化语音合成对象
         mTts = SpeechSynthesizer.createSynthesizer(this, null);
+        Log.d(TAG, "onCreate#analysisData: " + Thread.currentThread());
     }
 
     private void notification() {
@@ -97,7 +101,7 @@ public class WebSocketService extends Service
     };
 
     private void createConnect(final ClientSocket clientSocket) {
-        new Thread(new Runnable() {
+        executorService.execute(new Runnable() {
             @Override
             public void run() {
                 boolean ok = true;
@@ -108,12 +112,12 @@ public class WebSocketService extends Service
                 while (ok) {
                     if (clientSocket.createConnect(host, 4444)) {
                         ok = false;
-                        tcpState("车载服务器：RTC的TCP连接成功");
+                        tcpState(Thread.currentThread().getName()+"车载服务器：RTC的TCP连接成功");
                         clientSocket.registerObserver(rxObserver);
                     } else {
                         host = (String) SPUtils.get(WebSocketService.this,
                                 SPUtils.gps_tcp_ip, SPUtils.tcp_ip_default_value);
-                        tcpState("车载服务器：RTK的TCP连接失败，请检查应用的RTK IP配置");
+                        tcpState(Thread.currentThread().getName()+"车载服务器：RTK的TCP连接失败，请检查应用的RTK IP配置");
                     }
                     try {
                         Thread.sleep(5000);
@@ -123,7 +127,7 @@ public class WebSocketService extends Service
                 }
             }
 
-        }).start();
+        });
     }
 
     /**

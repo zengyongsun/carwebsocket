@@ -1,8 +1,13 @@
 package com.dm.carwebsocket.gps;
 
+import android.os.Build;
 import android.util.Log;
 
-import java.io.*;
+import androidx.annotation.RequiresApi;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -24,6 +29,8 @@ public class ClientSocket {
     private InputStream mInputStream;
     private OutputStream mOutputStream;
     private DealWidth mDealWidth;
+    private String hostIp = "172.0.0.1";
+    private PingIpThread pingIpThread = null;
 
     private List<ConnectState> mState = new ArrayList<>();
 
@@ -38,7 +45,8 @@ public class ClientSocket {
     private static ClientSocket instance = new ClientSocket();
 
     private ClientSocket() {
-//        new ProcessThread2().start();
+        pingIpThread = new PingIpThread();
+        pingIpThread.start();
     }
 
     public static ClientSocket getInstance() {
@@ -63,7 +71,6 @@ public class ClientSocket {
         try {
             this.mSocket = new Socket();
             this.mSocket.connect(new InetSocketAddress(host, port), 5000);
-
         } catch (IOException e) {
             e.printStackTrace();
             return false;
@@ -73,6 +80,7 @@ public class ClientSocket {
             this.mOutputStream = mSocket.getOutputStream();
             this.mDealWidth = new DealWidth(this.mSocket, this.mInputStream, this.mOutputStream,
                     new ReaderDataPackageParser(), new ReaderDataPackageProcess());
+            this.pingIpThread.setPingIp(host);
         } catch (Exception e) {
             e.printStackTrace();
             return false;
@@ -82,6 +90,7 @@ public class ClientSocket {
 
 
     private void disConnect() {
+        isRead = false;
         try {
             if (mDealWidth != null) {
                 mDealWidth.singOut();
@@ -97,7 +106,6 @@ public class ClientSocket {
 
     public class DealWidth {
         private ProcessThread processThread = null;
-//        private ConnectThread connectThread = null;
         private InputStream in;
         private OutputStream out;
         private Socket mSocket;
@@ -119,10 +127,10 @@ public class ClientSocket {
         }
 
         public void startThread() {
+            Log.d(TAG, "startThread#analysisData: " + Thread.currentThread());
             this.processThread = new ProcessThread();
             this.processThread.start();
-//            this.connectThread = new ConnectThread();
-//            this.connectThread.start();
+
         }
 
         public void registerObserver(Observer observer) {
@@ -144,9 +152,6 @@ public class ClientSocket {
                 if (processThread != null) {
                     processThread.setRunning(false);
                 }
-//                if (connectThread != null) {
-//                    connectThread.setRunning(false);
-//                }
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -169,6 +174,8 @@ public class ClientSocket {
                 while (isRunning) {
                     byte[] btAryBuffer = new byte[1024];
                     try {
+                        isRead = true;
+                        isConnect =true;
                         int nLenRead = DealWidth.this.in.read(btAryBuffer);
                         if (nLenRead > 0) {
                             byte[] btAryReceiveData = new byte[nLenRead];
@@ -180,64 +187,80 @@ public class ClientSocket {
                                     DealWidth.this.mPackageProcess);
                         }
                     } catch (IOException e) {
-                        Log.d(TAG, "run:SocketException:" + e.getMessage());
-                        if (mState != null) {
-                            for (ConnectState item : mState) {
-                                item.reconnect();
-                            }
-                            disConnect();
-                        }
+                        isConnect = false;
+                        judgment("IOException Process 断开连接");
                     } catch (Exception e) {
+                        isConnect = false;
                         e.printStackTrace();
-                        Log.d(TAG, "run:Exception" + e.getMessage());
-                        if (mState != null) {
-                            for (ConnectState item : mState) {
-                                item.reconnect();
-                            }
-                            disConnect();
-                        }
-                    }
-                }
-            }
-        }
-
-        private class ConnectThread extends Thread {
-
-            private boolean isRunning;
-
-            public ConnectThread() {
-                this.isRunning = true;
-            }
-
-            public void setRunning(boolean running) {
-                isRunning = running;
-            }
-
-            @Override
-            public void run() {
-                while (isRunning) {
-                    try {
-                        DealWidth.this.out.write(1); // 发送心跳包
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                        if (mState != null) {
-                            for (ConnectState item : mState) {
-                                item.reconnect();
-                            }
-                            disConnect();
-                        }
-                        System.out.println("IOException！");
-                    }
-                    System.out.println("目前是正常的！");
-                    try {
-                        Thread.sleep(3 * 1000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
+                        judgment("Exception Process 断开连接");
                     }
                 }
             }
         }
     }
 
+
+    private boolean isRead = false;
+    private boolean isConnect = false;
+
+    public class PingIpThread extends Thread {
+
+        private boolean isRunning = true;
+        private String pingIp = "";
+
+        public PingIpThread() {
+        }
+
+        public void setRunning(boolean running) {
+            isRunning = running;
+        }
+
+        public void setPingIp(String pingIp) {
+            this.pingIp = pingIp;
+        }
+
+        @Override
+        public void run() {
+            Runtime runtime = Runtime.getRuntime();
+            while (isRunning) {
+                try {
+                    ////ping -c 3 -w 100  中  ，-c 是指ping的次数 3是指ping 3次 ，-w 100  以秒为单位指定超时间隔，是指超时时间为100秒
+                    Process p = runtime.exec("ping -c 1 " + pingIp);
+                    int ret = p.waitFor();
+                    String msg = Thread.currentThread().getName() + " " + pingIp + "    Process:    " + ret;
+                    Log.i("Avalible", pingIp + "    Process:    " + ret);
+                    if (ret != 0) {
+                        judgment("connect断开连接");
+                    }else{
+                        isConnect =true;
+                    }
+                    if (mState != null) {
+                        for (ConnectState item : mState) {
+                            item.message(msg.getBytes());
+                        }
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    Log.i("Avalible", "Process:" + e.getMessage());
+                    judgment("Exception connect断开连接");
+                }
+                try {
+                    Thread.sleep(2000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    private synchronized void judgment(String msg) {
+        if (mState != null && isRead ) {
+            disConnect();
+            for (ConnectState item : mState) {
+                item.reconnect();
+                item.message(msg.getBytes());
+            }
+        }
+    }
 }
 

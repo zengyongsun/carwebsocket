@@ -335,6 +335,68 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 //apk的保存路径
                 .setTargetPath(path)
                 .build()
-                .update();
+                .checkNewApp(new UpdateCallback() {
+                    @Override
+                    protected void hasNewApp(UpdateAppBean updateApp, UpdateAppManager updateAppManager) {
+                        Log.d(TAG, "hasNewApp: " + updateApp.toString());
+
+                        if (!AppUtils.needUpdate(MainActivity.this, updateApp.getNewVersion())) {
+                            return;
+                        }
+                        //添加信息
+                        final UpdateAppBean updateAppBean = updateAppManager.fillUpdateAppData();
+                        //设置不显示通知栏下载进度
+                        updateAppBean.dismissNotificationProgress(true);
+
+                        final File appFile = AppUpdateUtils.getAppFile(updateAppBean);
+                        String md5 = getFileMD5(appFile);
+                        Log.d("UpdateAppManager", "文件 md5 = " + md5 + "服务器 md5 = " + updateAppBean.getNewMd5());
+                        if (updateAppBean.getNewMd5().equalsIgnoreCase(md5)) {
+                            AppUpdateUtils.installApp(MainActivity.this, appFile);
+                        } else {
+                            updateAppManager.download(new DownloadService.DownloadCallback() {
+                                @Override
+                                public void onStart() {
+
+                                }
+
+                                @Override
+                                public void onProgress(float progress, long totalSize) {
+
+                                }
+
+                                @Override
+                                public void setMax(long totalSize) {
+
+                                }
+
+                                @Override
+                                public boolean onFinish(File file) {
+                                    String md5 = getFileMD5(appFile);
+                                    if (updateAppBean.getNewMd5().equalsIgnoreCase(md5)) {
+                                        Log.d("UpdateAppManager", file.getAbsolutePath());
+                                        AppUpdateUtils.installApp(MainActivity.this, appFile);
+                                    } else {
+                                        Log.d("UpdateAppManager", "下载的文件md5匹配不上");
+                                    }
+                                    return false;
+                                }
+
+
+                                @Override
+                                public void onError(String msg) {
+
+                                }
+
+                                @Override
+                                public boolean onInstallAppAndAppOnForeground(File file) {
+                                    return false;
+                                }
+                            });
+                        }
+
+                    }
+                });
+
     }
 }
