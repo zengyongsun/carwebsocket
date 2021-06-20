@@ -85,6 +85,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         findViewById(R.id.SipClear).setOnClickListener(this);
         findViewById(R.id.showLog).setOnClickListener(this);
         findViewById(R.id.update).setOnClickListener(this);
+        findViewById(R.id.pingIp).setOnClickListener(this);
 
         String tcpDesc = (String) SPUtils.get(this, SPUtils.tcp_desc, "");
         String sipDesc = (String) SPUtils.get(this, SPUtils.sip_desc, "");
@@ -230,6 +231,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
             case R.id.update:
                 isNeedUpdate();
+                break;
+            case R.id.pingIp:
+                startActivity(new Intent(MainActivity.this, PingIpActivity.class));
                 break;
             default:
                 Toast.makeText(MainActivity.this, "未知的按钮", Toast.LENGTH_SHORT).show();
