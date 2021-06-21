@@ -5,6 +5,11 @@ import android.app.Application;
 import com.iflytek.cloud.SpeechConstant;
 import com.iflytek.cloud.SpeechUtility;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+
 public class MyApplication extends Application {
 
     @Override
@@ -22,4 +27,5 @@ public class MyApplication extends Application {
                 SpeechConstant.FORCE_LOGIN + "=true";
         SpeechUtility.createUtility(this, param);
     }
+
 }

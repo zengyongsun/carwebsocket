@@ -6,8 +6,10 @@ import android.content.pm.PackageManager;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.text.TextUtils;
+import android.util.Log;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.List;
 import java.util.Locale;
@@ -76,6 +78,16 @@ public class AppUtils {
     }
 
 
+    public static void chmod(String permission, String path) {
+        String command = "chmod " + permission + " " + path;
+        Runtime runtime = Runtime.getRuntime();
+        try {
+            runtime.exec(command);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     /**
      * 静默安装App
      *
@@ -83,6 +95,7 @@ public class AppUtils {
      * @return 是否安装成功
      */
     public static boolean installApp(String apkPath) {
+//        chmod("777", apkPath);
         Process process = null;
         BufferedReader successResult = null;
         BufferedReader errorResult = null;
@@ -101,6 +114,7 @@ public class AppUtils {
             }
         } catch (Exception e) {
             e.printStackTrace();
+            Log.d("AppUtils", "installApp: " + e.getMessage());
         } finally {
             try {
                 if (successResult != null) {
@@ -111,12 +125,14 @@ public class AppUtils {
                 }
             } catch (Exception e) {
                 e.printStackTrace();
-
+                Log.d("AppUtils", "installApp: " + e.getMessage());
             }
             if (process != null) {
                 process.destroy();
             }
         }
+        Log.d("AppUtils", "successMsg: " + successMsg.toString());
+        Log.d("AppUtils", "errorMsg: " + errorMsg.toString());
         //如果含有“success”单词则认为安装成功
         return successMsg.toString().equalsIgnoreCase("success");
     }

@@ -142,7 +142,7 @@ public class SPUtils {
 
 
     public static final String gps_tcp_ip = "gps_ip";
-    public static final String tcp_ip_default_value = "192.168.8.27";
+    public static final String tcp_ip_default_value = "192.168.8.151";
 
 
     public static final String sip_name = "sip_name";

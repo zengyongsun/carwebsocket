@@ -33,17 +33,18 @@ public class ReaderDataPackageParser {
                 //数据有两位，即有数据的len
                 if (btAryBuffer.length > nLoop + nLen) {
                     //查找起始的标识
-                    if (btAryBuffer[nLoop] == 36 && btAryBuffer[nLoop + 1] == 75
-                            && btAryBuffer[nLoop + 2] == 83 && btAryBuffer[nLoop + 3] == 88
-                            && btAryBuffer[nLoop + 4] == 84) {
-                        //$KSXT数据的头
-                        nIndex = nLoop;
-                        nLoop += 4;
+                    //查找起始的标识
+                    if (btAryBuffer[nLoop] == 36) {
+                        if (btAryBuffer[nLoop + 1] == 75 && btAryBuffer[nLoop + 2] == 83
+                                && btAryBuffer[nLoop + 3] == 88 && btAryBuffer[nLoop + 4] == 84) {
+                            //$KSXT数据的头
+                            nIndex = nLoop;
+                            nLoop += 4;
+                        }else{
+                            //增加，防止数据不完整时出错
+                            nIndex = -1;
+                        }
                     }
-//                    else {
-//                        nMarkIndex = nLoop;
-//                    }
-
                     //结束位
                     if (btAryBuffer[nLoop] == 42) {
                         if (nIndex != -1) {
@@ -51,7 +52,7 @@ public class ReaderDataPackageParser {
                             System.arraycopy(btAryBuffer, nIndex, btAryAnaly, 0, nLoop - nIndex);
                             //校验
                             dataPackageProcess.analyzeData(btAryAnaly);
-                            Log.d("ReaderDataPackageParser", "runReceiveDataCallback--: " + new String(btAryAnaly));
+                            Log.d("ReaderDataPackageParser", Thread.currentThread()+"" + new String(btAryAnaly));
                             nIndex = -1;
                         }
                     }
@@ -72,6 +73,7 @@ public class ReaderDataPackageParser {
             }
         } catch (Exception var10) {
             var10.printStackTrace();
+            Log.d("ReaderDataPackageParser", "runReceiveDataCallback: " + var10.getMessage());
         }
     }
 }

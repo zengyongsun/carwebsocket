@@ -3,6 +3,9 @@ package com.dm.carwebsocket;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 
+/**
+ * gps日志的实体类
+ */
 public class LogBean {
 
     private static SimpleDateFormat sdf = new SimpleDateFormat("yy-MM-dd HH:mm:ss", Locale.CHINA);

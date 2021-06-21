@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.IBinder;
 import android.util.Log;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 
@@ -16,13 +17,15 @@ import com.dm.carwebsocket.gps.ClientSocket;
 import com.dm.carwebsocket.gps.GpRmcBean;
 import com.dm.carwebsocket.gps.KSXTBean;
 import com.dm.carwebsocket.gps.RXObserver;
-import com.dm.carwebsocket.gps.SocketDataParser;
 import com.dm.carwebsocket.util.SPUtils;
 import com.dm.carwebsocket.websocket.ServiceManager;
 import com.google.gson.Gson;
 import com.iflytek.cloud.SpeechConstant;
 import com.iflytek.cloud.SpeechSynthesizer;
 import com.iflytek.cloud.util.ResourceUtil;
+
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * author : Zeyo
@@ -32,7 +35,7 @@ import com.iflytek.cloud.util.ResourceUtil;
  * version: 1.0
  */
 public class WebSocketService extends Service
-        implements ServiceManager.WebSocketReceiveData, SocketDataParser, ClientSocket.ConnectState {
+        implements ServiceManager.WebSocketReceiveData, ClientSocket.ConnectState {
 
     public static final String TAG = WebSocketService.class.getSimpleName();
     private ServiceManager serviceManager;
@@ -40,11 +43,26 @@ public class WebSocketService extends Service
     public static final String webSocketStateAction = "com.dm.carwebsocket.websocket_state";
     public static final String tcpStateAction = "com.dm.carwebsocket.tcp_state";
     private ClientSocket clientSocket;
-
+    ExecutorService executorService =  Executors.newFixedThreadPool(3);
     @Override
     public void onCreate() {
         super.onCreate();
         Log.d(TAG, "onCreate: 服务启动");
+        notification();
+        serviceManager = new ServiceManager();
+        serviceManager.start(7890);
+        serviceManager.setReceiveData(this);
+
+        clientSocket = ClientSocket.getInstance();
+        clientSocket.setState(this);
+        createConnect(clientSocket);
+
+        // 初始化语音合成对象
+        mTts = SpeechSynthesizer.createSynthesizer(this, null);
+        Log.d(TAG, "onCreate#analysisData: " + Thread.currentThread());
+    }
+
+    private void notification() {
         NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         Intent notificationIntent = new Intent(this, MainActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(this,
@@ -72,30 +90,18 @@ public class WebSocketService extends Service
                     .build();
             startForeground(1, notification);
         }
-        serviceManager = new ServiceManager();
-        serviceManager.start(7890);
-        serviceManager.setReceiveData(this);
-
-        clientSocket = ClientSocket.getInstance();
-        clientSocket.setState(this);
-
-        createConnect(clientSocket);
-
-        // 初始化语音合成对象
-        mTts = SpeechSynthesizer.createSynthesizer(this, null);
-
     }
 
     RXObserver rxObserver = new RXObserver() {
         @Override
         public void analysisData(String msgTran) {
-            Log.d(TAG, "analysisData: "+Thread.currentThread());
+            Log.d(TAG, "analysisData: " + Thread.currentThread());
             serviceManager.sendMessageToAll(parseKSXTToJson(msgTran));
         }
     };
 
     private void createConnect(final ClientSocket clientSocket) {
-        new Thread(new Runnable() {
+        executorService.execute(new Runnable() {
             @Override
             public void run() {
                 boolean ok = true;
@@ -106,12 +112,12 @@ public class WebSocketService extends Service
                 while (ok) {
                     if (clientSocket.createConnect(host, 4444)) {
                         ok = false;
-                        tcpState("车载服务器：RTC的TCP连接成功");
+                        tcpState(Thread.currentThread().getName()+"车载服务器：RTC的TCP连接成功");
                         clientSocket.registerObserver(rxObserver);
                     } else {
                         host = (String) SPUtils.get(WebSocketService.this,
                                 SPUtils.gps_tcp_ip, SPUtils.tcp_ip_default_value);
-                        tcpState("车载服务器：RTK的TCP连接失败，请检查应用的RTK IP配置");
+                        tcpState(Thread.currentThread().getName()+"车载服务器：RTK的TCP连接失败，请检查应用的RTK IP配置");
                     }
                     try {
                         Thread.sleep(5000);
@@ -121,7 +127,7 @@ public class WebSocketService extends Service
                 }
             }
 
-        }).start();
+        });
     }
 
     /**
@@ -199,18 +205,6 @@ public class WebSocketService extends Service
         sendBroadcast(intent, null);
     }
 
-    @Override
-    public void dataParser(final String data) {
-        Log.d(TAG, "dataParser: " + data);
-//        if (data.startsWith("$GPRMC")) {
-//            serviceManager.sendMessageToAll(parseToJson(data));
-//        }
-
-        if (data.startsWith("$KSXT")) {
-            serviceManager.sendMessageToAll(parseKSXTToJson(data));
-        }
-    }
-
     public String parseToJson(String data) {
         GpRmcBean gpRmcBean = new GpRmcBean(data);
         Gson gson = new Gson();
@@ -218,7 +212,13 @@ public class WebSocketService extends Service
     }
 
     public String parseKSXTToJson(String data) {
-        KSXTBean ksxt = new KSXTBean(data);
+        KSXTBean ksxt = null;
+        try {
+            ksxt = new KSXTBean(data);
+        } catch (Exception e) {
+            ksxt = new KSXTBean();
+            Toast.makeText(this, "数据解析出错", Toast.LENGTH_SHORT).show();
+        }
         Gson gson = new Gson();
         return gson.toJson(ksxt);
     }
