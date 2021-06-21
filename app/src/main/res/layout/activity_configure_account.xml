@@ -68,6 +68,7 @@
             android:id="@+id/password"
             android:layout_width="150dp"
             android:layout_height="50dp"
+            android:inputType="textPassword"
             android:textColor="@color/black"
             app:layout_constraintBottom_toBottomOf="@+id/tvPsw"
             app:layout_constraintLeft_toRightOf="@+id/tvPsw"
